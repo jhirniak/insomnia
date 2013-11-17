@@ -2,7 +2,10 @@ package com.codeforgood.musoni;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
+
+import com.codeforgood.musoni.api.APIrequest;
 
 public class MainActivity extends Activity {
 
@@ -11,10 +14,11 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
      
-        //just to try if the download works
-        APIrequest.getClients();
+        //APIrequest.loadClientList();
+        //APIrequest.loadGroupList();
+        APIrequest.loadLoanList();
+        
     }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

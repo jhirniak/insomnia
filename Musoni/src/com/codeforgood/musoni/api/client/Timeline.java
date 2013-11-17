@@ -1,4 +1,4 @@
-package com.codeforgood.musoni.json;
+package com.codeforgood.musoni.api.client;
 
 import com.google.gson.annotations.SerializedName;
 

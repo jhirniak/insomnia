@@ -1,4 +1,4 @@
-package com.codeforgood.musoni;
+package com.codeforgood.musoni.api;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one

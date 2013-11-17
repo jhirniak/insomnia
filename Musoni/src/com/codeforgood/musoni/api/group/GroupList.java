@@ -1,16 +1,16 @@
-package com.codeforgood.musoni.json;
+package com.codeforgood.musoni.api.group;
 
 import com.google.gson.annotations.SerializedName;
 
-public class ClientList 
+public class GroupList 
 {
 	@SerializedName("totalFilteredRecords")
 	int records;
 	
 	@SerializedName("pageItems")
-	PageItems pi;
+	GroupPageItems pi;
 	
-	public PageItems getPageItems()
+	public GroupPageItems getGroups()
 	{
 		return pi;
 	}

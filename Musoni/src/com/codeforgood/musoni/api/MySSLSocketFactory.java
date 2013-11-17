@@ -1,4 +1,4 @@
-package com.codeforgood.musoni;
+package com.codeforgood.musoni.api;
 
 import java.io.IOException;
 import java.net.Socket;

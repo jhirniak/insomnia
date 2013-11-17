@@ -1,4 +1,4 @@
-package com.codeforgood.musoni;
+package com.codeforgood.musoni.api;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -26,35 +26,56 @@ import android.os.AsyncTask;
 import android.util.Base64;
 import android.util.Log;
 
-import com.codeforgood.musoni.json.ClientList;
-import com.codeforgood.musoni.json.PageItems;
+import com.codeforgood.musoni.api.client.ClientList;
+import com.codeforgood.musoni.api.group.GroupList;
+import com.codeforgood.musoni.api.loan.LoanList;
 import com.google.gson.Gson;
 
 public class APIrequest 
 {
 	private static final String DOMAIN_NAME = "https://mlite-demo.musoni.eu:8443/mifosng-provider/api/v1/";
 	private static final String TENANT_IDENTIFIER = "?tenantIdentifier=code4good";
+	public static final String REQUEST_CLIENTS = "clients";
+	public static final String REQUEST_GROUPS = "groups";
+	public static final String REQUEST_LOAN = "loans";
+	private static ClientList clients = null;
+	private static LoanList loans = null;
+	private static GroupList groups = null;
 	
 	private static String createRequest(String requestContent)
 	{
 		return DOMAIN_NAME+requestContent+TENANT_IDENTIFIER;
 	}
 	
-	public static void getClients()
+	public static void loadClientList()
 	{
 		ReadEvents re = new ReadEvents();
-        re.execute(new String[] {createRequest("clients")});
+        re.execute(new String[] {createRequest(REQUEST_CLIENTS)}); 
+	}	
+	
+	public static void loadGroupList()
+	{
+		ReadEvents re = new ReadEvents();
+        re.execute(new String[] {createRequest(REQUEST_GROUPS)});
+	}
+	
+	public static void loadLoanList()
+	{
+		ReadEvents re = new ReadEvents();
+        re.execute(new String[] {createRequest(REQUEST_LOAN)});
 	}
 	
 	private static class ReadEvents extends AsyncTask<String, Integer, String>
-    {
+	{		
+		String current = "";
+		
 		/* (non-Javadoc)
 		 * @see android.os.AsyncTask#doInBackground(Params[])
 		 */
 		@Override
 		protected String doInBackground(String... params) 
 		{
-			Log.e("DEBUG", "url - "+params[0]);
+			current = params[0];
 			return httpGet(params[0]);
 		}
 		
@@ -64,11 +85,27 @@ public class APIrequest
 		@Override
 		protected void onPostExecute(String read) 
 		{	
-			PageItems p = jsonToTwitter(read).getPageItems();
-			//Log.e("DEBUG", read);
-			
-			for (int i = 0; i < p.size(); i++)
-				Log.e("DEBUG", p.get(i).toString());
+			if (current.equals(REQUEST_CLIENTS))
+			{
+				clients = jsonToClientList(read);
+				
+				for (int i = 0; i < clients.getClients().size(); i++)
+					Log.e("DEBUG", clients.getClients().get(i).toString());
+			}
+			else if (current.equals(REQUEST_GROUPS))
+			{
+				groups = jsonToGroupList(read);
+				
+				for (int i = 0; i < groups.getGroups().size(); i++)
+					Log.e("DEBUG", groups.getGroups().get(i).toString());
+			}
+			else
+			{
+				loans = jsonToLoanList(read);
+				
+				for (int i = 0; i < loans.getLoans().size(); i++)
+					Log.e("DEBUG", loans.getLoans().get(i).toString());
+			}
 		}
 		
 		private String httpGet(String urlToRead)
@@ -124,16 +161,39 @@ public class APIrequest
 		}
     }
 	
-	private static ClientList jsonToTwitter(String result) 
+	private static ClientList jsonToClientList(String result) 
 	{
-		ClientList twits = null;
+		ClientList list = null;
 		if (result != null && result.length() > 0) 
 		{
 			try {
-				twits = new Gson().fromJson(result, ClientList.class);
+				list = new Gson().fromJson(result, ClientList.class);
 			} catch (IllegalStateException ex) {ex.printStackTrace();}
 		}
-		return twits;
+		return list;
 	}
-
+	
+	private static GroupList jsonToGroupList(String result) 
+	{
+		GroupList list = null;
+		if (result != null && result.length() > 0) 
+		{
+			try {
+				list = new Gson().fromJson(result, GroupList.class);
+			} catch (IllegalStateException ex) {ex.printStackTrace();}
+		}
+		return list;
+	}
+	
+	private static LoanList jsonToLoanList(String result) 
+	{
+		LoanList list = null;
+		if (result != null && result.length() > 0) 
+		{
+			try {
+				list = new Gson().fromJson(result, LoanList.class);
+			} catch (IllegalStateException ex) {ex.printStackTrace();}
+		}
+		return list;
+	}	
 }

@@ -1,8 +1,8 @@
-package com.codeforgood.musoni.json;
+package com.codeforgood.musoni.api.group;
 
 import com.google.gson.annotations.SerializedName;
 
-public class ClientStatus 
+public class GroupStatus 
 {
 	@SerializedName("id")
 	int id;
@@ -15,6 +15,7 @@ public class ClientStatus
 	
 	public String toString()
 	{
-		return "status = "+id+", "+code+", "+value;
+		return ""+id+", "+code+", "+value;
 	}
+
 }
