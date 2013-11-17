@@ -2,6 +2,7 @@ package com.codeforgood.offlinedb;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.StringReader;
 import java.nio.charset.Charset;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -13,6 +14,9 @@ import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.SecretKeySpec;
 
+import org.xmlpull.v1.XmlPullParser;
+import org.xmlpull.v1.XmlPullParserException;
+import org.xmlpull.v1.XmlPullParserFactory;
 import org.xmlpull.v1.XmlSerializer;
 
 import com.codeforgood.musoni.MainActivity;
@@ -50,7 +54,7 @@ public class ModifiedDB implements ModifiedDBInterface
 			IllegalBlockSizeException, 
 			BadPaddingException
 	{
-		String data = serialize();
+		String data = toXML();
 		byte[] dataBytes = data.getBytes(Charset.forName("UTF-8"));
 		saveFile(filename, encrypt(dataBytes));
 	}
@@ -138,23 +142,24 @@ public class ModifiedDB implements ModifiedDBInterface
 		{ e.printStackTrace(); }
 	}
 	
-	private String serialize()
-	{
-		StringBuilder sb = new StringBuilder();
-		sb.append("{");
-		for (String tableName : modifs.keySet())
-		{
-			sb.append(tableName + ": {");
-			HashMap<String, Field> table = modifs.get(tableName);
-			for (String column : table.keySet())
-			{
-				sb.append("(" + column + ", " + table.get(column) + ")");
-			}
-			sb.append("},");
-		}
-		sb.append("}");
-		return sb.toString();
-	}
+// implemented as XML below, commented section kept as insurance	
+//	private String serialize()
+//	{
+//		StringBuilder sb = new StringBuilder();
+//		sb.append("{");
+//		for (String tableName : modifs.keySet())
+//		{
+//			sb.append(tableName + ": {");
+//			HashMap<String, Field> table = modifs.get(tableName);
+//			for (String column : table.keySet())
+//			{
+//				sb.append("(" + column + ", " + table.get(column) + ")");
+//			}
+//			sb.append("},");
+//		}
+//		sb.append("}");
+//		return sb.toString();
+//	}
 	
 	private String toXML()
 	{
@@ -174,9 +179,23 @@ public class ModifiedDB implements ModifiedDBInterface
 		return sb.toString();
 	}
 	
-	private String parse(String input)
+	private void parse(String input) throws XmlPullParserException
 	{
-		//XMLParser parser = new XMLParser();
-		return null;
+		XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
+		factory.setNamespaceAware(true);
+        XmlPullParser xpp = factory.newPullParser();
+        xpp.setInput( new StringReader ( input ) );
+        int eventType = xpp.getEventType();
+        while (eventType != XmlPullParser.END_DOCUMENT)
+        {
+        	String table = 	xpp.getText();
+        	while (!(eventType == XmlPullParser.END_TAG))
+        	{
+        		String cell = xpp.getText();
+        		Field<String> value = new Field<String>();
+        		value.set( xpp.getText() );
+        		put(table, cell, value);
+        	}
+        }
 	}
 }
